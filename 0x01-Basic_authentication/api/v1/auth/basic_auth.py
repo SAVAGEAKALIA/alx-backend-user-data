@@ -31,8 +31,9 @@ class BasicAuth(Auth):
             return None
         return auth_header[6:]  # Remove 'Basic ' prefix.
 
-    def decode_base64_authorization_header\
-                    (self, b64_auth_header: str) -> str:
+    def decode_base64_authorization_header(self,
+                                           b64_auth_header: str) \
+            -> str:
         """
         Decodes the Base64 encoded authorization header.
 
@@ -52,8 +53,9 @@ class BasicAuth(Auth):
             return None
         return decoded_str
 
-    def extract_user_credentials\
-                    (self, decoded_b64_auth_header: str) -> Tuple[str, str]:
+    def extract_user_credentials(self,
+                                 decoded_b64_auth_header: str) \
+            -> Tuple[str, str]:
         """
         Extracts the user email and password from the decoded header.
 
@@ -63,7 +65,8 @@ class BasicAuth(Auth):
 
         Returns:
             Tuple[str, str]:
-            A tuple containing the email and password, or (None, None) if invalid.
+            A tuple containing the email and password,
+            or (None, None) if invalid.
         """
         if (
             decoded_b64_auth_header is None
@@ -73,7 +76,9 @@ class BasicAuth(Auth):
             return None, None
         return decoded_b64_auth_header.split(':', 1)
 
-    def user_object_from_credentials(self, user_email: str, user_pwd: str) -> TypeVar('User'):
+    def user_object_from_credentials(self,
+                                     user_email: str,
+                                     user_pwd: str) -> TypeVar('User'):
         """
         Retrieves a
         User object based on the provided email and password.
@@ -123,7 +128,8 @@ class BasicAuth(Auth):
         decoded_header = self.decode_base64_authorization_header(base64_header)
 
         # Extract user credentials (email and password).
-        user_email, user_password = self.extract_user_credentials(decoded_header)
+        user_email, user_password = \
+            self.extract_user_credentials(decoded_header)
 
         # Retrieve the user object from the provided credentials.
         user = self.user_object_from_credentials(user_email, user_password)
