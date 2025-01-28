@@ -32,8 +32,7 @@ class BasicAuth(Auth):
         return auth_header[6:]  # Remove 'Basic ' prefix.
 
     def decode_base64_authorization_header(self,
-                                           b64_auth_header: str) \
-            -> str:
+                                           b64_auth_header: str) -> str:
         """
         Decodes the Base64 encoded authorization header.
 
