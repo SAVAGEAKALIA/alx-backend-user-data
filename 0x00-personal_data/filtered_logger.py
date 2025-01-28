@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-This script demonstrates the use of regex for replacing occurrences of sensitive field values (PII - Personally Identifiable Information)
-in log records. It connects to a MySQL database, retrieves data from a users table, and logs the information
-with sensitive fields redacted.
+This script demonstrates the use of regex for replacing occurrences of sensitive field values (PII)
+in log records. It connects to a MySQL database, retrieves data from a users table, and logs the
+information with sensitive fields redacted.
 """
 
 import os
@@ -11,13 +11,15 @@ from typing import List
 import mysql.connector
 import re
 
+PII_FIELDS = ("name", "email", "password", "ssn", "phone")  # Fields to redact
+
 
 class RedactingFormatter(logging.Formatter):
-    """ Formatter class to redact sensitive fields in log messages """
+    """Formatter class to redact sensitive fields in log messages."""
 
-    REDACTION = "***"  # Placeholder for redacted values
-    FORMAT = "[APPLICATION] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
-    SEPARATOR = "; "  # Separator used in log messages
+    REDACTION = "***"
+    FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
+    SEPARATOR = "; "
 
     def __init__(self, fields: List[str]):
         """
@@ -42,24 +44,6 @@ class RedactingFormatter(logging.Formatter):
         return filter_datum(self.fields, self.REDACTION, super().format(record), self.SEPARATOR)
 
 
-PII_FIELDS = ["name", "email", "password", "ssn", "phone"]  # Fields considered as PII
-
-
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """
-    Establishes and returns a connection to the MySQL database.
-
-    Returns:
-        mysql.connector.connection.MySQLConnection: Database connection object.
-    """
-    return mysql.connector.connect(
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
-        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
-        database=os.getenv('PERSONAL_DATA_DB_NAME')
-    )
-
-
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """
     Replaces occurrences of sensitive field values in a log message with a redaction string.
@@ -73,10 +57,9 @@ def filter_datum(fields: List[str], redaction: str, message: str, separator: str
     Returns:
         str: The filtered log message with sensitive fields redacted.
     """
-    for field in fields:
-        # Use regex to replace occurrences of "field=value" patterns with "field=***"
-        message = re.sub(f'{field}=(.*?){separator}', f'{field}={redaction}{separator}', message)
-    return message
+    # Create a single regex pattern to match and replace sensitive fields
+    pattern = f"({'|'.join(fields)})=.*?{separator}"
+    return re.sub(pattern, lambda m: f"{m.group(1)}={redaction}{separator}", message)
 
 
 def get_logger() -> logging.Logger:
@@ -88,18 +71,29 @@ def get_logger() -> logging.Logger:
     """
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
-    logger.propagate = False  # Prevent propagation to parent loggers
+    logger.propagate = False
 
-    # Create a stream handler to output logs to console
     stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-
-    # Apply the custom formatter for redacting sensitive fields
     formatter = RedactingFormatter(PII_FIELDS)
     stream_handler.setFormatter(formatter)
 
     logger.addHandler(stream_handler)
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """
+    Establishes and returns a connection to the MySQL database.
+
+    Returns:
+        mysql.connector.connection.MySQLConnection: Database connection object.
+    """
+    return mysql.connector.connect(
+        user=os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),
+        password=os.getenv("PERSONAL_DATA_DB_PASSWORD", ""),
+        host=os.getenv("PERSONAL_DATA_DB_HOST", "localhost"),
+        database=os.getenv("PERSONAL_DATA_DB_NAME")
+    )
 
 
 def main() -> None:
@@ -109,18 +103,14 @@ def main() -> None:
     2. Retrieve all rows from the users table.
     3. Log the retrieved rows with sensitive fields redacted.
     """
-    db = get_db()  # Get database connection
+    db = get_db()
     cursor = db.cursor()
 
     try:
-        # Execute query to fetch all rows from the users table
         cursor.execute("SELECT * FROM users;")
-
-        # Get column headers for building log messages
         headers = [desc[0] for desc in cursor.description]
         logger = get_logger()
 
-        # Iterate over each row and log the data with sensitive fields redacted
         for row in cursor:
             message = "".join(
                 f"{header}={value}{RedactingFormatter.SEPARATOR}"
@@ -129,10 +119,9 @@ def main() -> None:
             logger.info(message)
 
     finally:
-        # Ensure resources are properly closed
         cursor.close()
         db.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
