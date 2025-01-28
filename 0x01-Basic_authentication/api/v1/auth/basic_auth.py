@@ -31,7 +31,8 @@ class BasicAuth(Auth):
             return None
         return auth_header[6:]  # Remove 'Basic ' prefix.
 
-    def decode_base64_authorization_header(self, b64_auth_header: str) -> str:
+    def decode_base64_authorization_header\
+                    (self, b64_auth_header: str) -> str:
         """
         Decodes the Base64 encoded authorization header.
 
@@ -51,15 +52,18 @@ class BasicAuth(Auth):
             return None
         return decoded_str
 
-    def extract_user_credentials(self, decoded_b64_auth_header: str) -> Tuple[str, str]:
+    def extract_user_credentials\
+                    (self, decoded_b64_auth_header: str) -> Tuple[str, str]:
         """
         Extracts the user email and password from the decoded header.
 
         Args:
-            decoded_b64_auth_header (str): Decoded authorization string in the format 'email:password'.
+            decoded_b64_auth_header (str):
+            Decoded authorization string in the format 'email:password'.
 
         Returns:
-            Tuple[str, str]: A tuple containing the email and password, or (None, None) if invalid.
+            Tuple[str, str]:
+            A tuple containing the email and password, or (None, None) if invalid.
         """
         if (
             decoded_b64_auth_header is None
@@ -71,16 +75,19 @@ class BasicAuth(Auth):
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str) -> TypeVar('User'):
         """
-        Retrieves a User object based on the provided email and password.
+        Retrieves a
+        User object based on the provided email and password.
 
         Args:
             user_email (str): User's email.
             user_pwd (str): User's password.
 
         Returns:
-            User: The user object if valid credentials are found, otherwise None.
+            User:
+            The user object if valid credentials are found, otherwise None.
         """
-        if user_email is None or not isinstance(user_email, str) or user_pwd is None or not isinstance(user_pwd, str):
+        if user_email is None or not isinstance(user_email, str) \
+                or user_pwd is None or not isinstance(user_pwd, str):
             return None
         try:
             # Search for users with the given email.
@@ -96,13 +103,15 @@ class BasicAuth(Auth):
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
-        Retrieves the current user based on the request's Authorization header.
+        Retrieves the current user
+        based on the request's Authorization header.
 
         Args:
             request: Flask request object.
 
         Returns:
-            User: The authenticated user object, or None if authentication fails.
+            User:
+            The authenticated user object, or None if authentication fails.
         """
         # Get the Authorization header from the request.
         auth_header = self.authorization_header(request)
