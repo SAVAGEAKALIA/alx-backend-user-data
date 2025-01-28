@@ -44,10 +44,14 @@ class RedactingFormatter(logging.Formatter):
         Returns:
             str: The formatted log message with sensitive fields redacted.
         """
-        return filter_datum(self.fields, self.REDACTION, super().format(record), self.SEPARATOR)
+        return \
+            filter_datum(self.fields,
+                         self.REDACTION, super().format(record),
+                         self.SEPARATOR)
 
 
-def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
+def filter_datum(fields: List[str], redaction: str,
+                 message: str, separator: str) -> str:
     """
     Replaces occurrences of sensitive
     field values in a log message with a redaction string.
@@ -63,7 +67,9 @@ def filter_datum(fields: List[str], redaction: str, message: str, separator: str
     """
     # Create a single regex pattern to match and replace sensitive fields
     pattern = f"({'|'.join(fields)})=.*?{separator}"
-    return re.sub(pattern, lambda m: f"{m.group(1)}={redaction}{separator}", message)
+    return re.sub(pattern,
+                  lambda m: f"{m.group(1)}={redaction}{separator}",
+                  message)
 
 
 def get_logger() -> logging.Logger:
