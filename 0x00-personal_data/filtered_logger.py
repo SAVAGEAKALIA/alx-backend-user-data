@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-This script demonstrates the use of regex for replacing occurrences of sensitive field values (PII)
-in log records. It connects to a MySQL database, retrieves data from a users table, and logs the
+This script demonstrates the use of regex for replacing
+occurrences of sensitive field values (PII)
+in log records.
+It connects to a MySQL database,
+retrieves data from a users table, and logs the
 information with sensitive fields redacted.
 """
 
@@ -46,7 +49,8 @@ class RedactingFormatter(logging.Formatter):
 
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """
-    Replaces occurrences of sensitive field values in a log message with a redaction string.
+    Replaces occurrences of sensitive
+    field values in a log message with a redaction string.
 
     Args:
         fields (List[str]): List of field names to redact.
@@ -86,7 +90,8 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     Establishes and returns a connection to the MySQL database.
 
     Returns:
-        mysql.connector.connection.MySQLConnection: Database connection object.
+        mysql.connector.connection.MySQLConnection:
+        Database connection object.
     """
     return mysql.connector.connect(
         user=os.getenv("PERSONAL_DATA_DB_USERNAME", "root"),

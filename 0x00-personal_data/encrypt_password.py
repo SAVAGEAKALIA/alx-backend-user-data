@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-""" Utility functions for password hashing and validation using bcrypt """
+""" Utility functions for password
+hashing and validation using bcrypt """
 import bcrypt
+
 
 def hash_password(password: str) -> bytes:
     """
@@ -17,6 +19,7 @@ def hash_password(password: str) -> bytes:
     """
     # Encode the password to bytes and hash it with a generated salt
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
 
 def is_valid(hashed_password: bytes, password: str) -> bool:
     """
