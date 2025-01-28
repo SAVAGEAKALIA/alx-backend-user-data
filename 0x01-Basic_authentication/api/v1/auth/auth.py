@@ -18,7 +18,8 @@ class Auth:
 
         Args:
             path (str): The request path to verify.
-            excluded_paths (List[str]): List of paths excluded from authentication.
+            excluded_paths (List[str]):
+            List of paths excluded from authentication.
 
         Returns:
             bool: True if authentication is required, False otherwise.
@@ -35,7 +36,8 @@ class Auth:
 
         # Check for wildcard matches
         for excluded_path in normalized_excluded_paths:
-            if excluded_path.endswith('*') and path.startswith(excluded_path[:-1]):
+            if excluded_path.endswith('*') \
+                    and path.startswith(excluded_path[:-1]):
                 return False
 
         # Check for exact matches
