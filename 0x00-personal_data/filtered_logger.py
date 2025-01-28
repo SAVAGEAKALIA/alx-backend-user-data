@@ -21,7 +21,8 @@ class RedactingFormatter(logging.Formatter):
     """Formatter class to redact sensitive fields in log messages."""
 
     REDACTION = "***"
-    FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
+    FORMAT = "[HOLBERTON] %(name)s " \
+             "%(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = "; "
 
     def __init__(self, fields: List[str]):
@@ -66,10 +67,11 @@ def filter_datum(fields: List[str], redaction: str,
         str: The filtered log message with sensitive fields redacted.
     """
     # Create a single regex pattern to match and replace sensitive fields
-    pattern = f"({'|'.join(fields)})=.*?{separator}"
-    return re.sub(pattern,
-                  lambda m: f"{m.group(1)}={redaction}{separator}",
-                  message)
+    for field in fields:
+        message = re.sub(f'{field}=(.*?){separator}',
+                         f'{field}={redaction}{separator}',
+                         message)
+    return message
 
 
 def get_logger() -> logging.Logger:
